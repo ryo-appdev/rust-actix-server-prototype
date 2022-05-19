@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+  web:
+    image: rust-actix-server-prototype
+    container_name: rust-actix-server-prototype
+    hostname: localhost
+    env_file:
+      - ../rsrc/env/.env.docker
+    ports:
+      - "127.0.0.1:3001:3000"
+      - "127.0.0.1:8443:443"
+    depends_on:
+      - postgres
+      - redis
+  
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGPASSWORD: postgres
+      POSTGRES_DB: database
+      TZ: "Asia/Tokyo"
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@pgadmin.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    ports:
+      - "127.0.0.1:81:80"
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    # hostname: redis-server
+    restart: always
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis:/usr/local/var/db/redis/
+
+volumes:
+  postgres:
+  pgadmin:
+  redis:
